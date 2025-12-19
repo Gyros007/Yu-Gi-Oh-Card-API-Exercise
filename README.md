@@ -1,100 +1,130 @@
-## Installation
+# Yu-Gi-Oh Card API Exercise
+
+## How to build the project image
 
 ```sh
-npm i
-npm run dev
+docker build -t yu-gi-oh-card-api-exercise-app .
 ```
 
-## Build
+## How to run image (with docker-compose)
 
 ```sh
-npm run build
+docker-compose up --build
 ```
 
+## Example curl commands for the APIs
 
-#### Commit Message Format
-Each commit message consists of a **header**, a **body** and a **footer**.  The header has a special
-format that includes a **type**, a **scope** and a **subject**:
+| Method | Endpoint               | Body                                                  | Description          |
+| ------ | ---------------------- | ----------------------------------------------------- | -------------------- |
+| POST   | `/api/cards`           | `{ "name": "Dark Magician", "type": "monster" }`      | Create a new card    |
+| GET    | `/api/cards`           | –                                                     | Get all cards        |
+| GET    | `/api/cards/<card_id>` | –                                                     | Get a card by its ID |
+| PUT    | `/api/cards/<card_id>` | `{ "name": "Dark Magician Girl", "type": "monster" }` | Update a card        |
+| DELETE | `/api/cards/<card_id>` | –                                                     | Delete a card        |
 
-```
-<type>(<scope>): <subject>
-<BLANK LINE>
-<body>
-<BLANK LINE>
-<footer>
-```
+### Create a Card
 
-The **header** is mandatory and the **scope** of the header is optional.
+curl -X POST <http://localhost:3000/api/cards> \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Dark Magician",
+    "type": "monster"
+  }'
 
-Any line of the commit message cannot be longer 100 characters! This allows the message to be easier
-to read on GitHub as well as in various git tools.
+Response (201 Created)
+{
+  "_id": "694550b6b40d1bdeb6a60ba0",
+  "name": "Dark Magician",
+  "type": "monster",
+  "createdAt": "2025-12-19T13:18:46.832Z",
+  "updatedAt": "2025-12-19T13:18:46.832Z",
+  "__v": 0
+}
 
-The footer should contain a [closing reference to an issue](https://help.github.com/articles/closing-issues-via-commit-messages/) if any.
+### Get All Cards
 
-Samples: (even more [samples](https://github.com/angular/angular/commits/master))
+curl -X GET <http://localhost:3000/api/cards>
 
-```
-docs(changelog): update changelog to beta.5
-```
-```
-fix(release): need to depend on latest rxjs and zone.js
+Response (200 OK)
 
-The version in our package.json gets copied to the one we publish, and users need the latest of these.
-```
+[
+  {
+    "_id": "694550b6b40d1bdeb6a60ba0",
+    "name": "Dark Magician",
+    "type": "monster",
+    "createdAt": "2025-12-19T13:18:46.832Z",
+    "updatedAt": "2025-12-19T13:18:46.832Z",
+    "__v": 0
+  },
+  {
+    "_id": "694552d1b40d1bdeb6a60ba1",
+    "name": "Blue-Eyes White Dragon",
+    "type": "monster",
+    "createdAt": "2025-12-19T13:25:12.123Z",
+    "updatedAt": "2025-12-19T13:25:12.123Z",
+    "__v": 0
+  }
+]
 
-#### Revert
-If the commit reverts a previous commit, it should begin with `revert: `, followed by the header of the reverted commit. In the body it should say: `This reverts commit <hash>.`, where the hash is the SHA of the commit being reverted.
+### Get Card by ID
 
-#### Type
-Must be one of the following:
+curl -X GET <http://localhost:3000/api/cards/><card_id>
 
-* **build**: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
-* **ci**: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
-* **docs**: Documentation only changes
-* **feat**: A new feature
-* **fix**: A bug fix
-* **perf**: A code change that improves performance
-* **refactor**: A code change that neither fixes a bug nor adds a feature
-* **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
-* **test**: Adding missing tests or correcting existing tests
+Response (200 OK)
 
-#### Scope
-The scope should be the name of the npm package affected (as perceived by the person reading the changelog generated from commit messages).
+{
+  "_id": "694550b6b40d1bdeb6a60ba0",
+  "name": "Dark Magician",
+  "type": "monster",
+  "createdAt": "2025-12-19T13:18:46.832Z",
+  "updatedAt": "2025-12-19T13:18:46.832Z",
+  "__v": 0
+}
 
-The following is the list of supported scopes:
+Response if not found (404 Not Found)
 
-* **walkthrough-page**
-* **login-page**
-* **preload-image-component**
+{
+  "message": "Card not found"
+}
 
-There are currently a few exceptions:
+### Update Card
 
-* **packaging**: used for changes that change the npm package layout in all of our packages, e.g.
-  public path changes, package.json changes done to all packages, d.ts file/format changes, changes
-  to bundles, etc.
-* **changelog**: used for updating the release notes in CHANGELOG.md
-* none/empty string: useful for `style`, `test` and `refactor` changes that are done across all
-  packages (e.g. `style: add missing semicolons`) and for docs changes that are not related to a
-  specific package (e.g. `docs: fix typo in tutorial`).
+curl -X PUT <http://localhost:3000/api/cards/><card_id> \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Dark Magician Girl",
+    "type": "monster"
+  }'
 
-#### Subject
-The subject contains a succinct description of the change:
+Response (200 OK)
 
-* use the imperative, present tense: "change" not "changed" nor "changes"
-* don't capitalize the first letter
-* no dot (.) at the end
+{
+  "_id": "694550b6b40d1bdeb6a60ba0",
+  "name": "Dark Magician Girl",
+  "type": "monster",
+  "createdAt": "2025-12-19T13:18:46.832Z",
+  "updatedAt": "2025-12-19T13:30:10.456Z",
+  "__v": 0
+}
 
-#### Body
-Just as in the **subject**, use the imperative, present tense: "change" not "changed" nor "changes".
-The body should include the motivation for the change and contrast this with previous behavior.
+Response if not found (404 Not Found)
 
-#### Footer
-The footer should contain any information about **Breaking Changes** and is also the place to
-reference GitHub issues that this commit **Closes**.
+{
+  "message": "Card not found"
+}
 
-**Breaking Changes** should start with the word `BREAKING CHANGE:` with a space or two newlines. The rest of the commit message is then used for this.
+### Delete Card
 
+curl -X DELETE <http://localhost:3000/api/cards/><card_id>
 
-## Troubleshooting
-### See what dependencies and versions you have installed in your project
-This is useful to track compilation ERRORS
+Response (200 OK)
+
+{
+  "message": "Card deleted successfully"
+}
+
+Response if not found (404 Not Found)
+
+{
+  "message": "Card not found"
+}
