@@ -9,6 +9,7 @@ app.use("/api/cards", cardRoute)
 
 
 const PORT = process.env.PORT || 3000;
+const mongoUrl = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/test";
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
@@ -16,7 +17,7 @@ app.listen(PORT, () => {
 
 async function connectDB() {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/test");
+    await mongoose.connect(mongoUrl);
     console.log("MongoDB connected");
   } catch (error) {
     console.error("MongoDB connection failed:", error);
