@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Card } from "../models/card.model";
+import { Card, MonsterCard, SpellCard, TrapCard } from "../models/card.model";
 import { Error } from "mongoose";
 import { MongoServerError } from "mongodb";
 
@@ -47,15 +47,49 @@ export const getCard = async (req: Request, res: Response) => {
 
 export const updateCard = async (req: Request, res: Response) => {
   try {
-    const card = await Card.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-      strict: "throw",
-    });
+    const card = await Card.findById(req.params.id);
     if (!card) {
       return res.status(404).json({ message: "Card not found" });
     }
-    res.json(card);
+
+    let updatedCard;
+
+    switch (card.card_type) {
+      case "Monster Card":
+        updatedCard = await MonsterCard.findByIdAndUpdate(
+          req.params.id,
+          req.body,
+          {
+            new: true,
+            runValidators: true,
+            strict: "throw",
+          }
+        );
+        break;
+      case "Spell Card":
+        updatedCard = await SpellCard.findByIdAndUpdate(
+          req.params.id,
+          req.body,
+          {
+            new: true,
+            runValidators: true,
+            strict: "throw",
+          }
+        );
+        break;
+      case "Trap Card":
+        updatedCard = await TrapCard.findByIdAndUpdate(
+          req.params.id,
+          req.body,
+          {
+            new: true,
+            runValidators: true,
+            strict: "throw",
+          }
+        );
+        break;
+    }
+    res.json(updatedCard);
   } catch (error: unknown) {
     if (error instanceof Error || error instanceof MongoServerError) {
       res.status(400).json({ message: error.message });
